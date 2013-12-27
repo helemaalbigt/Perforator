@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>HTML</title>
+		<meta name="author" content="Thomas" />
+		<link rel="stylesheet" href="css/simple-slider.css">
+		<link rel="stylesheet" href="css/style.css">
+		<!--<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js?ver=1.4.2'></script>-->
+		<script type='text/javascript' src='javascript/jquery-1.10.2.min.js'></script>
+		<script type='text/javascript' src='javascript/simple-slider.js'></script>
+		<script type='text/javascript' src='javascript/debiki-utterscroll.js'></script>
+		<script type='text/javascript' src='javascript/jquery-scrollable.js'></script>
+		<!--main canvas script-->
+		<script type='text/javascript' src='javascript/script.js'></script>
+		<!--call the method for creating and updating slidervalues-->
+		<script type='text/javascript'>
+			$(document).ready(function() {
+				createSliderInfo();
+			});
+		</script>
+		<!--target specific browsers--->
+		<!--IE-->
+		<!--[if IE]>
+		<link rel="stylesheet" href="css/IEstyle.css">
+		<![endif]-->
+		<!--IE10-->
+		<script>
+			var b = document.documentElement;
+			b.setAttribute('data-useragent', navigator.userAgent);
+			b.setAttribute('data-platform', navigator.platform);
+		</script>
+		<!-- Date: 2013-12-01 -->
+	</head>
+
+	<body>
+		<div class="PA">
+			<div class="PA_wrapper">
+				<!--popupbox incompatible browser-->
+				<div class="uncompatible_browser">
+					<div class="black">
+						-
+					</div>
+					<div class="message">
+						<span>This application currently only supports Firefox and Chrome</br></br>Sorry &nbsp;¯\_(ツ)_/¯</span>
+					</div>
+				</div>
+				<!--start sidebar-->
+				<div class="sidebar_menu">
+					<div class="menu_group">
+						<div class="app_title">
+							<h4><span>Perforations</span></h4>
+						</div>
+					</div>
+
+					<!--input image-->
+					<div class="menu_group">
+						<div class="menuitem input">
+							<div class="input_img_wrapper">
+								<img id="input_img">
+								<div id="input_img_helptext">
+									<span>select an image to process</span>
+								</div>
+							</div>
+							<div id="seekerwindow">
+								<canvas id="canvas_seeker" width="1" height="1"></canvas>
+							</div>
+						</div>
+					</div>
+
+					<div class="menu_group">
+						<!--upload image-->
+						<div class="menu_subgroup">
+							<div class="clickable_area_fullwidth">
+								<input id="img_input" type="file" name="img" onchange="onFileSelected(event)">
+								<div id="img_input_backbutton">
+									<span>upload image<img src="files/upload.png"/></span>
+								</div>
+							</div>
+						</div>
+						<!--download jpeg-->
+						<div class="menu_subgroup">
+							<div class="clickable_area_fullwidth download_image download_jpeg">
+								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
+								<a id="downloadlnk" download="perforations.png"><span>download PNG<img src="files/download.png"/></span></a>
+							</div>
+						</div>
+						<!--refresh button-->
+						<div class="menu_subgroup final">
+							<div class="clickable_area_fullwidth refresh_image">
+								<!--<input id="refresh" type="button" name="refresh" value="refresh" onmousedown="refreshPressed()">-->
+								<a href='javascript:refreshPressed()'><span>redraw<img src="files/refresh.png"/></span></a>
+							</div>
+						</div>
+					</div>
+					<div class="menu_group">
+						<!--selection list - perforation type-->
+						<div class="menu_subgroup">
+							<div class="selection_list">
+								<div class="title">
+									perforation :
+								</div>
+								<select id="perforationtype" class="list" onchange="refreshPerfType()">
+									<option value="circles"><span>circles</span></option>
+									<option value="rectangles"><span>rectangles</span></option>
+								</select>
+							</div>
+						</div>
+						<!--selection list - gridlayout-->
+						<div class="menu_subgroup">
+							<div class="selection_list">
+								<div class="title">
+									grid :
+								</div>
+								<select id="gridstacking" class="list" onchange="refreshGrid()">
+									<option value="ortho" selected="selected"><span>orthogonal</span></option>
+									<option value="tri"><span>triangular</span></option>
+								</select>
+							</div>
+						</div>
+						<!--sliders - perforation size-->
+						<div class="menu_subgroup final">
+							<div class="sliders">
+								<div class="slider_wrapper">
+									<input id="minD" type="text" data-slider="true" data-slider-range="0,5"
+									data-slider-step="1" value="0" name="minimum Diameter:" data-slider-snap="true">
+
+									<input id="maxD" type="text" data-slider="true" data-slider-range="5,20"
+									data-slider-step="1" value="8" name="maximum Diameter:" data-slider-snap="true">
+
+									<input id="minMargin" type="text" data-slider="true" data-slider-range="1,20"
+									data-slider-step="1" value="3" name="minimum margin:" data-slider-snap="true">
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<!--end sidebar-->
+				<!--start canvas-->
+				<div id="render_window" onscroll="updateSeekerWindow()">
+					<canvas id="canvas" width="1" height="1"></canvas>
+				</div>
+				<!--end canvas-->
+			</div>
+		</div>
+		<script>
+			if (!Modernizr.touch)// if not a smartphone
+				debiki.Utterscroll.enable({
+					scrollstoppers : '.CodeMirror, .ui-resizable-handle'
+				});
+		</script>
+	</body>
+</html>
+

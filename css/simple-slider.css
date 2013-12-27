@@ -1,0 +1,32 @@
+.slider {
+  width: 100%;
+}
+
+.slider > .dragger {
+  /*background: #8DCA09;*/
+ background: rgb(205,205,205);
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+
+  width: 10px;
+  height: 10px;
+}
+
+.slider > .dragger:hover {
+  background: -webkit-linear-gradient(top, #8DCA09, #8DCA09);
+}
+
+
+.slider > .track, .slider > .highlight-track {
+  background: rgb(15,15,15);
+  height: 4px;
+}
+
+.slider > .highlight-track {
+	background: rgb(60,60,60);
+	
+	border-color: #496805;
+}
+
