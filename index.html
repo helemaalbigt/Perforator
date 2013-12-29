@@ -101,7 +101,7 @@
 						<div class="menu_subgroup">
 							<div class="selection_list">
 								<div class="title">
-									perforation :
+									perforation:
 								</div>
 								<select id="perforationtype" class="list" onchange="refreshPerfType()">
 									<option value="circles"><span>circles</span></option>
@@ -110,10 +110,10 @@
 							</div>
 						</div>
 						<!--selection list - gridlayout-->
-						<div class="menu_subgroup">
+						<div class="menu_subgroup final">
 							<div class="selection_list">
 								<div class="title">
-									grid :
+									grid:
 								</div>
 								<select id="gridstacking" class="list" onchange="refreshGrid()">
 									<option value="ortho" selected="selected"><span>orthogonal</span></option>
@@ -121,8 +121,25 @@
 								</select>
 							</div>
 						</div>
-						<!--sliders - perforation size-->
+					</div>
+					<div class="menu_group">
+						<!--selection list - fixed sizes-->
 						<div class="menu_subgroup final">
+							<div class="selection_list">
+								<div class="title">
+									perforation sizes:
+								</div>
+								<select id="perforationsizes" class="list" onchange="">
+									<option value="0" selected="selected"><span>unlimited</span></option>
+									<option value="2"><span>2</span></option>
+									<option value="3"><span>3</span></option>
+									<option value="4"><span>4</span></option>
+									<option value="5"><span>5</span></option>
+								</select>
+							</div>
+
+							<!--sliders - perforation size-->
+
 							<div class="sliders">
 								<div class="slider_wrapper">
 									<input id="minD" type="text" data-slider="true" data-slider-range="0,5"
@@ -131,7 +148,16 @@
 									<input id="maxD" type="text" data-slider="true" data-slider-range="5,20"
 									data-slider-step="1" value="8" name="maximum Diameter:" data-slider-snap="true">
 
-									<input id="minMargin" type="text" data-slider="true" data-slider-range="1,20"
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="menu_group">
+						<!--sliders - perforation size-->
+						<div class="menu_subgroup final">
+							<div class="sliders">
+								<div class="slider_wrapper">
+									<input title="minimal margin between perforations" id="minMargin" type="text" data-slider="true" data-slider-range="1,20"
 									data-slider-step="1" value="3" name="minimum margin:" data-slider-snap="true">
 								</div>
 							</div>
@@ -141,9 +167,9 @@
 				</div>
 				<!--end sidebar-->
 				<!--loading-->
-					<div id="loading_image">
-						<img src='files/loading.gif'/>
-					</div>
+				<div id="loading_image">
+					<img src='files/loading.gif'/>
+				</div>
 				<!--start canvas-->
 				<div id="render_window" onscroll="updateSeekerWindow()">
 					<!--canvas-->
