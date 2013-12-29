@@ -26,7 +26,9 @@ var pixels = new Array();
  * main refreshing function *
  * ************************ */
 function refresh() {
-	console.log(X + "-" + Y);
+	//activate load gif
+	$('#loading_image').css("display", "block");
+
 	/*PREPARING THE CANVAS*/
 	//get the main canvas
 	var canvas = document.getElementById("canvas");
@@ -34,6 +36,8 @@ function refresh() {
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
 	var OSCanvas = $('<canvas/>')[0];
 	var OSctx = OSCanvas.getContext("2d");
+
+	console.log("- canvas loaded");
 
 	/*DRAW*/
 	//if an image was added, generate the pattern
@@ -101,7 +105,7 @@ function refresh() {
 		var numbP;
 		for ( numbP = 0; initialX + numbP * stepX < img.width; numbP += 1) {
 		}
-		console.log(perforations);
+		console.log("- canvas preliminary data calculated");
 
 		for (var i = 0; initialX + i * stepX < img.width; i += 1) {
 			for (var j = 0; initialY + j * stepY < img.height; j += 1) {
@@ -149,13 +153,16 @@ function refresh() {
 						ctx.arc(X + posX, Y + posY, D / 2, 0, 2 * 3.14159265359, false);
 						ctx.fillStyle = 'white';
 						ctx.fill();
-					} else if(perforations == "rectangles"){
+					} else if (perforations == "rectangles") {
 						ctx.fillStyle = 'white';
-						ctx.fillRect(X + posX-D/2, Y + posY-D/2, D, D);
+						ctx.fillRect(X + posX - D / 2, Y + posY - D / 2, D, D);
 					}
 				}
 			}
 		}
+		console.log("- canvas pattern drawn");
+		//de-activate load gif
+		$('#loading_image').css("display", "none");
 	}
 }
 
@@ -180,19 +187,16 @@ function getAverage(posX, posY) {
 	var count = 0;
 	for ( i = Math.round(-stepX / 2); i < (stepX / 2); i++) {
 		for ( j = Math.round(-stepY / 2); i < (stepY / 2); i++) {
-			console.log(img.width * (posY - 1 + j) + posX + i);
 			if (pixels[img.width * (posY - 1 + j) + posX + i]) {
 				R += pixels[img.width * (posY - 1 + j) + posX + i][0];
 				G += pixels[img.width * (posY - 1 + j) + posX + i][1];
 				B += pixels[img.width * (posY - 1 + j) + posX + i][2];
 				a += pixels[img.width * (posY - 1 + j) + posX + i][3];
 				count++;
-				console.log("ok");
 			}
 		}
 	}
 	if (parseInt(count) > 0) {
-		console.log("ok");
 		R = R / count;
 		G = G / count;
 		B = B / count;
@@ -226,16 +230,15 @@ function refreshPressed() {
 }
 
 //activate dropdown
-function refreshPerfType(){
+function refreshPerfType() {
 	var e = document.getElementById("perforationtype").options[document.getElementById("perforationtype").selectedIndex].value;
-	console.log(e);
 	if (e == "circles" || e == "rectangles") {
 		perforations = e;
 	}
 }
 
 //activate perforations
-function refreshGrid(){
+function refreshGrid() {
 	var e = document.getElementById("gridstacking").options[document.getElementById("gridstacking").selectedIndex].value;
 	if (e == "ortho") {
 		ortho = true;
@@ -246,9 +249,14 @@ function refreshGrid(){
 
 //activate fileselect
 function onFileSelected(event) {
+	//activate load gif
+	$('#loading_image').css("display", "block");
+
 	var selectedFile = event.target.files[0];
 	var reader = new FileReader();
 	imgInputFocus = true;
+
+	console.log("new image selected");
 
 	//changethe miniature image seen in the sidebar
 	var imgtag = document.getElementById("input_img");
@@ -261,11 +269,15 @@ function onFileSelected(event) {
 	canvasImage.title = selectedFile.name;
 
 	reader.onload = function(event) {
+		console.log("- image filereader loaded");
+
 		$("#input_img_helptext").hide();
 		imgtag.src = event.target.result;
 		canvasImage.src = event.target.result;
 		//as soon as the image has loaded completely, assign it to 'img' and refresh the canvas
 		canvasImage.onload = function(event) {
+			console.log("- image loaded");
+
 			img = canvasImage;
 			refresh();
 			updateSeekerWindowVariables();
@@ -337,9 +349,6 @@ function updateSeekerWindow() {
 		//set canvas to width/height of image
 		$("#canvas_seeker").attr("width", ws);
 		$("#canvas_seeker").attr("height", hs);
-
-		console.log("1");
-		console.log("2");
 
 		ctx.fillStyle = 'rgba(255,255,255,.5)';
 		ctx.fillStyle = 'rgba(0,0,0,.6)';
