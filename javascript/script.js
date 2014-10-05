@@ -21,17 +21,15 @@ var perforations = "circles";
 var ortho = true;
 //pixel array
 var pixels = new Array();
+//main drawing canvas
+var canvas;
 
 /* ************************ *
  * main refreshing function *
  * ************************ */
 function refresh() {
-	console.log(X + "-" + Y);
+	
 	/*PREPARING THE CANVAS*/
-	//get the main canvas
-	var canvas = document.getElementById("canvas");
-	//var canvas = new fabric.Canvas('canvas');
-	var ctx = canvas.getContext("2d");
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
 	var OSCanvas = $('<canvas/>')[0];
 	var OSctx = OSCanvas.getContext("2d");
@@ -39,6 +37,9 @@ function refresh() {
 	/*DRAW*/
 	//if an image was added, generate the pattern
 	if (img != null) {
+		//get the main canvas
+		canvas = new fabric.Canvas('canvas');
+		canvas.renderOnAddRemove = false;
 		//store full-size image on offscreen canvas
 		OSCanvas.width = img.width;
 		OSCanvas.height = img.height;
@@ -51,7 +52,7 @@ function refresh() {
 		//set canvas to width/height of image
 		$("#canvas").attr("width", img.width);
 		$("#canvas").attr("height", img.height);
-		//determin the origin of the generated image
+		//determine the origin of the generated image
 		if (img.width > W && img.height > H) {
 			//place canvas in the corner
 			$("#canvas").css('left', 0);
@@ -69,6 +70,17 @@ function refresh() {
 			$("#canvas").css('left', 0 + W / 2 - img.width / 2 + 'px');
 			$("#canvas").css('top', 0 + H / 2 - img.height / 2 + 'px');
 		}
+		
+				//draw black rectangle on main canvas
+		var rect = new fabric.Rect({
+		  left: X,
+		  top: Y,
+		  fill: 'black',
+		  width: img.width,
+		  height: img.height
+		});
+		// "add" rectangle onto canvas
+		canvas.add(rect);
 
 		//update the seeker window on the preview img
 		updateSeekerWindowVariables();
@@ -85,27 +97,18 @@ function refresh() {
 		initialX = Math.round(stepX / 2);
 		initialY = Math.round(stepY / 2);
 
-		//clear canvas
-		canvas.width = canvas.width;
-		//draw black rectangle on main canvas
-		ctx.fillStyle = 'black';
-		ctx.fillRect(X, Y, img.width, img.height);
-
 		//get all the imagedata and put it in an array with each element being an array of the R/G/B/a value of that pixel
 		var data = OSctx.getImageData(0, 0, img.width, img.height).data;
-		//var pixels = new Array();
+		//empty the pixels array
 		pixels = [];
+		//save a 2D array containing the RGBA value(i think?) of each pixel 
 		for (var k = 0; k * 4 < data.length; k++) {
 			pixels[k] = [data[k * 4], data[k * 4 + 1], data[k * 4 + 2], data[k * 4 + 3]];
 		}
-		//number of perforations horizontally
-		var numbP;
-		for ( numbP = 0; initialX + numbP * stepX < img.width; numbP += 1) {
-		}
-		console.log(perforations);
-
+		
 		for (var i = 0; initialX + i * stepX < img.width; i += 1) {
 			for (var j = 0; initialY + j * stepY < img.height; j += 1) {
+				
 				var posX = initialX + i * stepX;
 				var posY = initialY + j * stepY;
 				if ((j % 2 === 0) && !ortho) {
@@ -143,20 +146,33 @@ function refresh() {
 
 					//convert RGB into brightness
 					var brightness = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
+					//map brightness to diameter
 					var D = convertToRange(brightness, [0, 255], [minD, maxD]);
 
 					if (perforations == "circles") {
-						ctx.beginPath();
-						ctx.arc(X + posX, Y + posY, D / 2, 0, 2 * 3.14159265359, false);
-						ctx.fillStyle = 'white';
-						ctx.fill();
+						var circle = new fabric.Circle({
+						  radius: D/2, fill: 'white', left: X + posX, top: Y + posY, stroke: 'black', strokeWidth: 1
+						});
+						
+						canvas.add(circle);
+						
 					} else if(perforations == "rectangles"){
-						ctx.fillStyle = 'white';
-						ctx.fillRect(X + posX-D/2, Y + posY-D/2, D, D);
+						var rect = new fabric.Rect({
+						  left: X + posX-D/2,
+						  top: Y + posY-D/2,
+						  fill: 'white',
+						  width: D,
+						  height: D,
+						  stroke: 'black', 
+						  strokeWidth: 1
+						});
+						
+						canvas.add(rect);
 					}
 				}
 			}
 		}
+		canvas.renderAll();
 	}
 }
 
@@ -304,35 +320,36 @@ var ys = 0;
 var varUpdated = false;
 
 function updateSeekerWindowVariables() {
-	var canvas = $("#canvas");
-	Hs = canvas.height();
-	Ws = canvas.width();
-
-	var renderWindow = $("#render_window");
-	As = renderWindow.height();
-	Bs = renderWindow.width();
-
-	Xs = renderWindow.scrollLeft();
-	Ys = renderWindow.scrollTop();
-
-	var previewImg = $("#input_img");
-	hs = previewImg.height();
-	ws = previewImg.width();
-
-	as = hs * As / Hs;
-	bs = ws * Bs / Ws;
-
-	xs = ws * Xs / Ws;
-	ys = hs * Ys / Hs;
-
-	varUpdated = true;
+	if (img != null) {
+		Hs = canvas.getHeight();
+		Ws = canvas.getWidth();
+	
+		var renderWindow = $("#render_window");
+		As = renderWindow.height();
+		Bs = renderWindow.width();
+	
+		Xs = renderWindow.scrollLeft();
+		Ys = renderWindow.scrollTop();
+	
+		var previewImg = $("#input_img");
+		hs = previewImg.height();
+		ws = previewImg.width();
+	
+		as = hs * As / Hs;
+		bs = ws * Bs / Ws;
+	
+		xs = ws * Xs / Ws;
+		ys = hs * Ys / Hs;
+	
+		varUpdated = true;
+	}
 }
 
 function updateSeekerWindow() {
 	if (varUpdated) {
 		updateSeekerWindowVariables()
 
-		var canvas = document.getElementById("canvas_seeker");
+		var canvas_seeker = document.getElementById("canvas_seeker");
 		var ctx = canvas_seeker.getContext("2d");
 
 		//set canvas to width/height of image
@@ -357,13 +374,14 @@ function updateSeekerWindow() {
 /* ***************************** *
  * download image manager         *
  * ****************************** */
+
 window.onload = function() {
 	var link = document.getElementById('downloadlnk');
 	link.addEventListener('click', downloadImage, false);
 	
 	var link = document.getElementById('downloadsvg');
 	link.addEventListener('click', downloadSVG, false);
-
+	
 	function downloadImage() {
 		var canvas = document.getElementById("canvas");
 		var fileName = document.getElementById("img_input").files[0].name.split('.')[0] + "_perforations";
@@ -373,11 +391,14 @@ window.onload = function() {
 	};
 	
 	function downloadSVG() {
-		/*var canvas = document.getElementById("canvas");
+		//only fire if an image was added
+		if (img != null) {
+		//var canvas = document.getElementById("canvas");
 		
-		alert(canvas.toSVG());*/
-		//var canvas = new fabric.Canvas('canvas');
-		//var alert(canvas.toSVG());
-		this.href = "data:application/octet-stream,"+canvas.toSVG();
+		/*alert(canvas.toSVG());*/
+		console.log(canvas.toSVG());
+		//encode the svg in base64 with the btoa() function
+		this.href = "data:application/octet-stream;charset=utf-8;base64,"+btoa(canvas.toSVG());
+		}
 	};
 };
