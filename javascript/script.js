@@ -30,6 +30,7 @@ function refresh() {
 	/*PREPARING THE CANVAS*/
 	//get the main canvas
 	var canvas = document.getElementById("canvas");
+	//var canvas = new fabric.Canvas('canvas');
 	var ctx = canvas.getContext("2d");
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
 	var OSCanvas = $('<canvas/>')[0];
@@ -359,6 +360,9 @@ function updateSeekerWindow() {
 window.onload = function() {
 	var link = document.getElementById('downloadlnk');
 	link.addEventListener('click', downloadImage, false);
+	
+	var link = document.getElementById('downloadsvg');
+	link.addEventListener('click', downloadSVG, false);
 
 	function downloadImage() {
 		var canvas = document.getElementById("canvas");
@@ -366,5 +370,14 @@ window.onload = function() {
 		link.download = fileName + ".png";
 		var dt = canvas.toDataURL('image/png');
 		this.href = dt;
+	};
+	
+	function downloadSVG() {
+		/*var canvas = document.getElementById("canvas");
+		
+		alert(canvas.toSVG());*/
+		//var canvas = new fabric.Canvas('canvas');
+		//var alert(canvas.toSVG());
+		this.href = "data:application/octet-stream,"+canvas.toSVG();
 	};
 };

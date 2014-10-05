@@ -14,6 +14,7 @@
 		<script type='text/javascript' src='javascript/simple-slider.js'></script>
 		<script type='text/javascript' src='javascript/debiki-utterscroll.js'></script>
 		<script type='text/javascript' src='javascript/jquery-scrollable.js'></script>
+		<script type='text/javascript' src='javascript/fabric.js'></script>
 		<!--main canvas script-->
 		<script type='text/javascript' src='javascript/script.js'></script>
 		<!--call the method for creating and updating slidervalues-->
@@ -81,11 +82,18 @@
 								</div>
 							</div>
 						</div>
-						<!--download jpeg-->
+						<!--download png-->
 						<div class="menu_subgroup">
 							<div class="clickable_area_fullwidth download_image download_jpeg">
 								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
 								<a id="downloadlnk" download="perforations.png"><span>download PNG<img src="files/download.png"/></span></a>
+							</div>
+						</div>
+						<!--download png-->
+						<div class="menu_subgroup">
+							<div class="clickable_area_fullwidth download_image download_jpeg">
+								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
+								<a id="downloadsvg" download="perforations.svg"><span>download SVG<img src="files/download.png"/></span></a>
 							</div>
 						</div>
 						<!--refresh button-->
@@ -144,7 +152,7 @@
 				<div id="render_window" onscroll="updateSeekerWindow()">
 					<canvas id="canvas" width="1" height="1"></canvas>
 				</div>
-				<!--end canvas-->
+				<!--end canvas-->				
 			</div>
 		</div>
 		<script>
