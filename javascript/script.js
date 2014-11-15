@@ -24,6 +24,8 @@ var ortho = true;
 var pixels = new Array();
 //main drawing canvas
 var canvas;
+//svg string
+var svgString = "";
 
 /* ************************ *
  * main refreshing function *
@@ -34,6 +36,9 @@ function refresh() {
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
 	var OSCanvas = $('<canvas/>')[0];
 	var OSctx = OSCanvas.getContext("2d");
+	
+	/*RESET SVG STRING*/
+	svgString = "<svg width='"+img.width+"' height='"+img.height+"'>";
 
 	/*DRAW*/
 	//if an image was added, generate the pattern
@@ -81,6 +86,9 @@ function refresh() {
 			  width: img.width,
 			  height: img.height
 			});
+			
+			//SVG
+			svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:rgb(0,0,0);' />";
 		} else{
 			//draw white rectangle on main canvas
 			var rect = new fabric.Rect({
@@ -90,6 +98,9 @@ function refresh() {
 			  width: img.width,
 			  height: img.height
 			});
+			
+			//SVG
+			svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:rgb(255,255,255);' />";
 		}
 		// "add" rectangle onto canvas
 		canvas.add(rect);
@@ -167,8 +178,10 @@ function refresh() {
 						var circle = new fabric.Circle({
 						  radius: D/2, fill: fillColor, left: X + posX-D/2, top: Y + posY-D/2, stroke: strokeColor, strokeWidth: 1
 						});
-						
 						canvas.add(circle);
+						
+						//SVG
+						svgString += "<circle cx='"+(X + posX)+"' cy='"+(Y + posY)+"' r='"+(D/2)+"' stroke='"+strokeColor+"' stroke-width='1' fill='"+fillColor+"' />";
 						
 					} else if(perforations == "rectangles"){
 						var rect = new fabric.Rect({
@@ -182,11 +195,17 @@ function refresh() {
 						});
 						
 						canvas.add(rect);
+						
+						//SVG
+						svgString += "<rect x='"+(X + posX-D/2)+"' y='"+(Y + posY-D/2)+"' width='"+D+"' height='"+D+"'  style='fill:"+fillColor+";stroke-width:1;stroke:"+strokeColor+"' />";
 					}
 				}
 			}
 		}
 		canvas.renderAll();
+		
+		/*CLOSE SVG STRING*/
+		svgString += "</svg>";
 	}
 }
 
@@ -404,9 +423,10 @@ window.onload = function() {
 		//var canvas = document.getElementById("canvas");
 		
 		/*alert(canvas.toSVG());*/
-		console.log(canvas.toSVG());
+		console.log(svgString);
 		//encode the svg in base64 with the btoa() function
-		this.href = "data:application/octet-stream;charset=utf-8;base64,"+btoa(canvas.toSVG());
+		//this.href = "data:application/octet-stream;charset=utf-8;base64,"+btoa(canvas.toSVG());
+		this.href = "data:application/octet-stream;charset=utf-8;base64,"+btoa(svgString);
 		}
 	};
 };
