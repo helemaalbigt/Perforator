@@ -100,7 +100,7 @@
 						<div class="menu_subgroup final">
 							<div class="clickable_area_fullwidth refresh_image">
 								<!--<input id="refresh" type="button" name="refresh" value="refresh" onmousedown="refreshPressed()">-->
-								<a href='javascript:refreshPressed()'><span>redraw<img src="files/refresh.png"/></span></a>
+								<a href='javascript:refresh()'><span>redraw<img src="files/refresh.png"/></span></a>
 							</div>
 						</div>
 					</div>
@@ -111,7 +111,7 @@
 								<div class="title">
 									perforation :
 								</div>
-								<select id="perforationtype" class="list" onchange="refreshPerfType()">
+								<select id="perforationtype" class="list input">
 									<option value="circles"><span>circles</span></option>
 									<option value="rectangles"><span>rectangles</span></option>
 								</select>
@@ -123,9 +123,21 @@
 								<div class="title">
 									grid :
 								</div>
-								<select id="gridstacking" class="list" onchange="refreshGrid()">
+								<select id="gridstacking" class="list input">
 									<option value="ortho" selected="selected"><span>orthogonal</span></option>
 									<option value="tri"><span>triangular</span></option>
+								</select>
+							</div>
+						</div>
+						<!--selection list - perforate-->
+						<div class="menu_subgroup">
+							<div class="selection_list">
+								<div class="title">
+									perforate :
+								</div>
+								<select id="perforate" class="list input">
+									<option value="false" selected="selected"><span>bright areas</span></option>
+									<option value="true"><span>dark areas</span></option>
 								</select>
 							</div>
 						</div>

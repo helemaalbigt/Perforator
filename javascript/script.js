@@ -15,6 +15,7 @@ var initialY = 10;
 var minD = 0;
 var maxD = 8;
 var minMargin = 3;
+var inverted = false;
 //rectangles or circles as perforations
 var perforations = "circles";
 //orthogonal grid or triangular grid
@@ -71,14 +72,25 @@ function refresh() {
 			$("#canvas").css('top', 0 + H / 2 - img.height / 2 + 'px');
 		}
 		
-				//draw black rectangle on main canvas
-		var rect = new fabric.Rect({
-		  left: X,
-		  top: Y,
-		  fill: 'black',
-		  width: img.width,
-		  height: img.height
-		});
+		if(!inverted){
+			//draw black rectangle on main canvas
+			var rect = new fabric.Rect({
+			  left: X,
+			  top: Y,
+			  fill: 'black',
+			  width: img.width,
+			  height: img.height
+			});
+		} else{
+			//draw white rectangle on main canvas
+			var rect = new fabric.Rect({
+			  left: X,
+			  top: Y,
+			  fill: 'white',
+			  width: img.width,
+			  height: img.height
+			});
+		}
 		// "add" rectangle onto canvas
 		canvas.add(rect);
 
@@ -147,11 +159,13 @@ function refresh() {
 					//convert RGB into brightness
 					var brightness = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
 					//map brightness to diameter
-					var D = convertToRange(brightness, [0, 255], [minD, maxD]);
+					var D = (!inverted) ? convertToRange(brightness, [0, 255], [minD, maxD]) : convertToRange(brightness, [0, 255], [maxD, minD]);
+					var fillColor = (!inverted) ? "white" : "black";
+					var strokeColor = (!inverted) ? "black" : "white";
 
 					if (perforations == "circles") {
 						var circle = new fabric.Circle({
-						  radius: D/2, fill: 'white', left: X + posX, top: Y + posY, stroke: 'black', strokeWidth: 1
+						  radius: D/2, fill: fillColor, left: X + posX-D/2, top: Y + posY-D/2, stroke: strokeColor, strokeWidth: 1
 						});
 						
 						canvas.add(circle);
@@ -160,10 +174,10 @@ function refresh() {
 						var rect = new fabric.Rect({
 						  left: X + posX-D/2,
 						  top: Y + posY-D/2,
-						  fill: 'white',
+						  fill: fillColor,
 						  width: D,
 						  height: D,
-						  stroke: 'black', 
+						  stroke: strokeColor, 
 						  strokeWidth: 1
 						});
 						
@@ -219,7 +233,7 @@ function getAverage(posX, posY) {
 }
 
 /* ***************************** *
- * ACTIVATE ALL INPUT PARAMETERS *
+ * ON PAGELOAD 					 *
  * ***************************** */
 
 $(document).ready(function() {
@@ -235,30 +249,24 @@ $(document).ready(function() {
 	$("#minMargin").bind("slider:changed", function(event, data) {
 		minMargin = data.value;
 	});
+	
+	/*
+	 * add eventlistener to all parameters and update them
+	 */
+	$( ".input" ).change(function() {
+  		updateParameters();
+	});
+	updateParameters();
+	
 });
 
-//activate buttons
-function refreshPressed() {
-	refresh();
-}
-
-//activate dropdown
-function refreshPerfType(){
-	var e = document.getElementById("perforationtype").options[document.getElementById("perforationtype").selectedIndex].value;
-	console.log(e);
-	if (e == "circles" || e == "rectangles") {
-		perforations = e;
-	}
-}
-
-//activate perforations
-function refreshGrid(){
-	var e = document.getElementById("gridstacking").options[document.getElementById("gridstacking").selectedIndex].value;
-	if (e == "ortho") {
-		ortho = true;
-	} else {
-		ortho = false;
-	}
+/**
+ *Updates all parameter 
+ */
+function updateParameters(){
+	perforations = $("#perforationtype").val();
+	ortho = ($("#gridstacking").val() == "ortho") ? true : false;
+	inverted = ($("#perforate").val() == "true") ? true : false;
 }
 
 //activate fileselect
