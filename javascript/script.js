@@ -24,18 +24,65 @@ var ortho = true;
 var pixels = new Array();
 //main drawing canvas
 var canvas;
+var ctx;
+//offscreen canvas
+var OSCanvas;
+var OSctx;
 //svg string
 var svgString = "";
 
+
+/* ***************************** *
+ * ON PAGELOAD 					 *
+ * ***************************** */
+
+$(document).ready(function() {
+	/*
+	 * activate sliders
+	 */
+	$("#minD").bind("slider:changed", function(event, data) {
+		minD = data.value;
+	});
+
+	$("#maxD").bind("slider:changed", function(event, data) {
+		maxD = data.value;
+	});
+
+	$("#minMargin").bind("slider:changed", function(event, data) {
+		minMargin = data.value;
+	});
+	
+	/*
+	 * define global variables
+	 */
+
+	
+	/*
+	 * add eventlistener to all parameters and update them
+	 */
+	$( ".input" ).change(function() {
+  		updateParameters();
+	});
+	
+	/*
+	 * update all parameters for the first time
+	 */
+	updateParameters();
+	
+});
+
 /* ************************ *
- * main refreshing function *
+ * DRAWING FUNCTIONS 		*
  * ************************ */
 function refresh() {
 	
-	/*PREPARING THE CANVAS*/
+	//get canvasses
+	//get the main canvas
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
-	var OSCanvas = $('<canvas/>')[0];
-	var OSctx = OSCanvas.getContext("2d");
+	OSCanvas = $('<canvas/>')[0];
+	OSctx = OSCanvas.getContext("2d");
 	
 	/*RESET SVG STRING*/
 	svgString = "<svg width='"+img.width+"' height='"+img.height+"'>";
@@ -43,9 +90,7 @@ function refresh() {
 	/*DRAW*/
 	//if an image was added, generate the pattern
 	if (img != null) {
-		//get the main canvas
-		canvas = new fabric.Canvas('canvas');
-		canvas.renderOnAddRemove = false;
+		
 		//store full-size image on offscreen canvas
 		OSCanvas.width = img.width;
 		OSCanvas.height = img.height;
@@ -58,6 +103,10 @@ function refresh() {
 		//set canvas to width/height of image
 		$("#canvas").attr("width", img.width);
 		$("#canvas").attr("height", img.height);
+		
+		//clear canvas
+		canvas.width = canvas.width;
+		
 		//determine the origin of the generated image
 		if (img.width > W && img.height > H) {
 			//place canvas in the corner
@@ -77,46 +126,21 @@ function refresh() {
 			$("#canvas").css('top', 0 + H / 2 - img.height / 2 + 'px');
 		}
 		
-		if(!inverted){
-			//draw black rectangle on main canvas
-			var rect = new fabric.Rect({
-			  left: X,
-			  top: Y,
-			  fill: 'black',
-			  width: img.width,
-			  height: img.height
-			});
-			
-			//SVG
-			svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:rgb(0,0,0);' />";
-		} else{
-			//draw white rectangle on main canvas
-			var rect = new fabric.Rect({
-			  left: X,
-			  top: Y,
-			  fill: 'white',
-			  width: img.width,
-			  height: img.height
-			});
-			
-			//SVG
-			svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:rgb(255,255,255);' />";
-		}
-		// "add" rectangle onto canvas
-		canvas.add(rect);
+		//draw black rectangle on main canvas (or white if inverted)
+		var backgroundFillColor = (!inverted) ? "black" : "white";
+		ctx.fillStyle = backgroundFillColor;
+		ctx.fillRect(X, Y, img.width, img.height);
+		//SVG
+		svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:"+backgroundFillColor+";' />";
 
 		//update the seeker window on the preview img
 		updateSeekerWindowVariables();
 		updateSeekerWindow();
 
-		//update all parameters
+		//update all drawing parameters
 		stepX = maxD + minMargin;
 		//if triangular stacking recalc stepY
-		if (ortho || perforations == "rectangles") {
-			stepY = maxD + minMargin;
-		} else {
-			stepY = Math.round(stepX * 0.86602540378);
-		}
+		stepY = (ortho || perforations == "rectangles") ? maxD + minMargin : Math.round(stepX * 0.86602540378);
 		initialX = Math.round(stepX / 2);
 		initialY = Math.round(stepY / 2);
 
@@ -171,39 +195,43 @@ function refresh() {
 					var brightness = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
 					//map brightness to diameter
 					var D = (!inverted) ? convertToRange(brightness, [0, 255], [minD, maxD]) : convertToRange(brightness, [0, 255], [maxD, minD]);
+					//determine perforation colors
 					var fillColor = (!inverted) ? "white" : "black";
 					var strokeColor = (!inverted) ? "black" : "white";
 
-					if (perforations == "circles") {
-						var circle = new fabric.Circle({
-						  radius: D/2, fill: fillColor, left: X + posX-D/2, top: Y + posY-D/2, stroke: strokeColor, strokeWidth: 1
-						});
-						canvas.add(circle);
-						
-						//SVG
-						svgString += "<circle cx='"+(X + posX)+"' cy='"+(Y + posY)+"' r='"+(D/2)+"' stroke='"+strokeColor+"' stroke-width='1' fill='"+fillColor+"' />";
-						
-					} else if(perforations == "rectangles"){
-						var rect = new fabric.Rect({
-						  left: X + posX-D/2,
-						  top: Y + posY-D/2,
-						  fill: fillColor,
-						  width: D,
-						  height: D,
-						  stroke: strokeColor, 
-						  strokeWidth: 1
-						});
-						
-						canvas.add(rect);
-						
-						//SVG
-						svgString += "<rect x='"+(X + posX-D/2)+"' y='"+(Y + posY-D/2)+"' width='"+D+"' height='"+D+"'  style='fill:"+fillColor+";stroke-width:1;stroke:"+strokeColor+"' />";
+					//draw perforation
+					switch(perforations) {
+					    case "rectangles":
+					    //draws rectangular perforation
+					        ctx.fillStyle = fillColor;
+							ctx.fillRect(X + posX-D/2, Y + posY-D/2, D, D);
+							ctx.lineWidth = 1;
+    						ctx.strokeStyle = strokeColor;
+      						ctx.stroke();
+							
+							//SVG
+							svgString += "<rect x='"+(X + posX-D/2)+"' y='"+(Y + posY-D/2)+"' width='"+D+"' height='"+D+"'  style='fill:"+fillColor+";stroke-width:1;stroke:"+strokeColor+"' />";
+							
+					        break;
+	
+					    default:
+					    	//draws circular perforation by default
+					    	ctx.beginPath();
+							ctx.arc(X + posX, Y + posY, D / 2, 0, 2 * 3.14159265359, false);
+							ctx.fillStyle = fillColor;
+							ctx.fill();
+							ctx.lineWidth = 1;
+    						ctx.strokeStyle = strokeColor;
+      						ctx.stroke();
+							
+							//SVG
+							svgString += "<circle cx='"+(X + posX)+"' cy='"+(Y + posY)+"' r='"+(D/2)+"' stroke='"+strokeColor+"' stroke-width='1' fill='"+fillColor+"' />";
+
+					        break;
 					}
 				}
 			}
 		}
-		canvas.renderAll();
-		
 		/*CLOSE SVG STRING*/
 		svgString += "</svg>";
 	}
@@ -251,33 +279,10 @@ function getAverage(posX, posY) {
 	return [R, G, B, a];
 }
 
-/* ***************************** *
- * ON PAGELOAD 					 *
- * ***************************** */
 
-$(document).ready(function() {
-	//activate sliders
-	$("#minD").bind("slider:changed", function(event, data) {
-		minD = data.value;
-	});
-
-	$("#maxD").bind("slider:changed", function(event, data) {
-		maxD = data.value;
-	});
-
-	$("#minMargin").bind("slider:changed", function(event, data) {
-		minMargin = data.value;
-	});
-	
-	/*
-	 * add eventlistener to all parameters and update them
-	 */
-	$( ".input" ).change(function() {
-  		updateParameters();
-	});
-	updateParameters();
-	
-});
+/*
+ * FUNCTIONS
+ */
 
 /**
  *Updates all parameter 
@@ -348,8 +353,8 @@ var varUpdated = false;
 
 function updateSeekerWindowVariables() {
 	if (img != null) {
-		Hs = canvas.getHeight();
-		Ws = canvas.getWidth();
+		Hs = canvas.height;
+		Ws = canvas.width;
 	
 		var renderWindow = $("#render_window");
 		As = renderWindow.height();
