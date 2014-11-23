@@ -119,7 +119,7 @@ and (max-device-width : 480px){
 /*general*/
 .PA .sidebar_menu {
 	display: block;
-	width: 200px;
+	width: 220px;
 	float: left;
 	height: 100vh;
 	background-color: rgb(50,50,50);
@@ -135,6 +135,10 @@ and (max-device-width : 480px){
 
 .PA .menu_subgroup{
 	border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+
+.PA .menu_subgroup.top{
+	border-top: 1px solid rgba(255,255,255,0.5);
 }
 
 .PA .menu_subgroup.final{
@@ -201,18 +205,32 @@ and (max-device-width : 480px){
 }
 
 /*clickable areas general*/
-.PA .clickable_area_fullwidth {
+.PA .clickable_area_fullwidth, .PA .inputline{
 	
 	position: relative;
 	height: 30px;
 }
 
-.PA .clickable_area_fullwidth a, .PA .clickable_area_fullwidth input {
+.PA .clickable_area_fullwidth a, .PA .clickable_area_fullwidth input{
 	color: white;
 	text-decoration: none;
 	display: block;
 	width: 100%;
 	height: 100%;
+	
+}
+
+.PA .inputline{
+		color: white;
+	text-decoration: none;
+	display: block;
+	width: 100%;
+}
+
+.PA .inputline span:first-child{
+    left: 7px;
+    position: relative;
+    top: 5.5px;
 }
 
 .PA .clickable_area_fullwidth a:hover, .PA .clickable_area_fullwidth input:hover {
@@ -341,7 +359,7 @@ and (max-device-width : 480px){
 }
 
 .PA .slider_wrapper {
-	margin: 10px 20px 6px 10px;
+	margin: 0 20px 0 10px;
 }
 
 .sliders .output, .sliders .title {
@@ -352,3 +370,49 @@ and (max-device-width : 480px){
 	margin-top: 8px;
 }
 
+/*NEW*/
+
+.menu_group_title{
+   background-color: rgb(230, 45, 45);
+    color: white;
+    font-weight: bold;
+    height: 25px;
+    padding: 5px 0 0 0px;
+    text-align: center;
+   //margin-left:10px;
+    text-decoration: underline;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.inline{
+	display:inline;
+}
+
+.S{
+	width:40px;
+}
+
+.XS{
+	width:32px;
+}
+
+.additional_text{
+	color:rgba(255,255,255,0.5);	
+}
+
+input{
+	border:none;
+	border-bottom: solid 1px rgba(255,255,255,0.5);
+	color:white;
+	background-color: rgb(230,45,45);
+	text-align:center;
+}
+
+.slider_input{
+	margin: 20px 0 ;
+}
+
+.slider{
+	margin: 25px 0px 5px 10px;
+}
