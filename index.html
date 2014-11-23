@@ -50,14 +50,14 @@
 				</div>
 				<!--start sidebar-->
 				<div class="sidebar_menu">
-					<div class="menu_group">
+					<div class="menu_group thick_underline">
 						<div class="app_title">
 							<h4><span>Perforations</span></h4>
 						</div>
 					</div>
 
 					<!--input image-->
-					<div class="menu_group">
+					<div class="menu_group thick_underline">
 						<div class="menuitem input">
 							<div class="input_img_wrapper">
 								<img id="input_img">
@@ -76,7 +76,7 @@
 							document
 						</div>
 						<!--upload image-->
-						<div class="menu_subgroup">
+						<div class="menu_subgroup border_top">
 							<div class="clickable_area_fullwidth">
 								<input id="img_input" type="file" name="img" onchange="onFileSelected(event)">
 								<div id="img_input_backbutton">
@@ -92,7 +92,7 @@
 							</span>
 						</div>
 						<!--refresh button-->
-						<div class="menu_subgroup final">
+						<div class="menu_subgroup">
 							<div class="clickable_area_fullwidth refresh_image">
 								<!--<input id="refresh" type="button" name="refresh" value="refresh" onmousedown="refreshPressed()">-->
 								<a href='javascript:refresh()'><span>redraw<img src="files/refresh.png"/></span></a>
@@ -105,7 +105,7 @@
 							hole shape
 						</div>
 						<!--selection list - perforation type-->
-						<div class="menu_subgroup">
+						<div class="menu_subgroup border_top">
 							<div class="selection_list">
 								<div class="title">
 									perforation :
@@ -147,7 +147,7 @@
 							hole size
 						</div>
 						<!--selection list - hole sizes-->
-						<div class="menu_subgroup">
+						<div class="menu_subgroup border_top">
 							<div class="selection_list">
 								<div class="title">
 									hole sizes :
@@ -159,7 +159,7 @@
 							</div>
 						</div>
 						<!--sliders - perforation size-->
-						<div class="menu_subgroup final">
+						<div class="menu_subgroup">
 							<div class="sliders">
 								<div class="slider_wrapper">								
 									<!--perf size-->									 
@@ -168,7 +168,7 @@
 										<label for="minD" class="inputlabel inline">D min:</label>
 										<input type="text" id="minD" class="XS inline input slider_input_range_min">
 										<label for="maxD" class="inputlabel inline">&nbsp; max:</label>
-										<input type="text" id="maxD" class="XS inline input slider_input_range_max">
+										<input type="text" id="maxD" class="XS inline input slider_input_range_max"><span class="additional_text">mm</span>
 									</div>
 									<!--min margin-->
 									<div class="slider_input">
@@ -186,7 +186,7 @@
 							download
 						</div>
 						<!--download png-->
-						<div class="menu_subgroup">
+						<div class="menu_subgroup border_top">
 							<div class="clickable_area_fullwidth download_image download_jpeg">
 								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
 								<a id="downloadlnk" download="perforations.png"><span>download PNG<img src="files/download.png"/></span></a>

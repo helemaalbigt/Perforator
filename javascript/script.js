@@ -26,6 +26,7 @@ var inverted = false; //whether bright areas are perforated (false) or dark area
 var perforations = "circles";//rectangles or circles as perforations
 var ortho = true;//orthogonal grid or triangular grid
 var pixels = new Array();//pixel array
+var scale = 2;//scale of everything on the canvas
 var canvas;//main drawing canvas
 var ctx;
 var OSCanvas;//offscreen canvas
@@ -241,28 +242,28 @@ function resizeCanvas(){
 	//get width/height of parent div
 	var W = $('#render_window').width();
 	var H = $('#render_window').height();
-	//set canvas to width/height of image
-	$("#canvas").attr("width", img.width);
-	$("#canvas").attr("height", img.height);
+	//set canvas to width/height of document
+	$("#canvas").attr("width", docW*scale);
+	$("#canvas").attr("height", docH*scale);
 	
 	
 	//determine the origin of the generated image
-	if (img.width > W && img.height > H) {
+	if (docW*scale > W && docH*scale > H) {
 		//place canvas in the corner
 		$("#canvas").css('left', 0);
 		$("#canvas").css('top', 0);
-	} else if (img.width > W && img.height < H) {
+	} else if (docW*scale > W && docH*scale < H) {
 		//place canvas in the vertical center
 		$("#canvas").css('left', 0);
-		$("#canvas").css('top', 0 + H / 2 - img.height / 2 + 'px');
-	} else if (img.width < W && img.height > H) {
+		$("#canvas").css('top', 0 + H / 2 - docH*scale / 2 + 'px');
+	} else if (docW*scale < W && docH*scale > H) {
 		//place canvas in the horizontal center
-		$("#canvas").css('left', 0 + W / 2 - img.width / 2 + 'px');
+		$("#canvas").css('left', 0 + W / 2 - docW*scale / 2 + 'px');
 		$("#canvas").css('top', 0);
 	} else {
 		//place canvas in the center
-		$("#canvas").css('left', 0 + W / 2 - img.width / 2 + 'px');
-		$("#canvas").css('top', 0 + H / 2 - img.height / 2 + 'px');
+		$("#canvas").css('left', 0 + W / 2 - docW*scale / 2 + 'px');
+		$("#canvas").css('top', 0 + H / 2 - docH*scale / 2 + 'px');
 	}
 }
 
@@ -334,26 +335,32 @@ function updateSeekerWindow() {
  * @return 
  */
 function draw(){
+	//scale canvas
+	ctx.scale(scale, scale);
+	
 	//draw black rectangle on main canvas (or white if inverted)
 	var backgroundFillColor = (!inverted) ? "black" : "white";
 	ctx.fillStyle = backgroundFillColor;
 	ctx.fillRect(X, Y, docW, docH);
 	//SVG
-	svgString += "<rect width='"+img.width+"' height='"+img.height+"' style='fill:"+backgroundFillColor+";' />";
+	svgString += "<rect width='"+docW+"' height='"+docH+"' style='fill:"+backgroundFillColor+";' />";
 	
 	for (var i = 0; initialX + i * stepX < img.width; i += 1) {
 		for (var j = 0; initialY + j * stepY < img.height; j += 1) {
 			
+			//X and Y position on the image
 			var posX = initialX + i * stepX;
 			var posY = initialY + j * stepY;
 			if ((j % 2 === 0) && !ortho) {
 				posX += Math.round(stepX / 2);
 			}
+			if(posX >= img.width) break;
 			//check if value exists
-			if (pixels[img.width * (posY - 1) + posX]) {
-				var red = pixels[img.width*(posY-1)+posX][0];
-				var green = pixels[img.width*(posY-1)+posX][1];
-				var blue = pixels[img.width*(posY-1)+posX][2];
+			var pixelIndex = Math.round(img.width*(posY-1)+posX);
+			if (pixels[pixelIndex]) {
+				var red = pixels[pixelIndex][0];
+				var green = pixels[pixelIndex][1];
+				var blue = pixels[pixelIndex][2];
 
 				//calculate average
 				var R = 0;
@@ -392,28 +399,28 @@ function draw(){
 				    case "rectangles":
 				    //draws rectangular perforation
 				        ctx.fillStyle = fillColor;
-						ctx.fillRect(X + posX-D/2, Y + posY-D/2, D, D);
+						ctx.fillRect(X + imgToDoc(posX)-D/2, Y + imgToDoc(posY)-D/2, D, D);
 						ctx.lineWidth = 1;
 						ctx.strokeStyle = strokeColor;
-  						ctx.stroke();
+  						//ctx.stroke();
 						
 						//SVG
-						svgString += "<rect x='"+(X + posX-D/2)+"' y='"+(Y + posY-D/2)+"' width='"+D+"' height='"+D+"'  style='fill:"+fillColor+";stroke-width:1;stroke:"+strokeColor+"' />";
+						svgString += "<rect x='"+(X + imgToDoc(posX)-D/2)+"' y='"+(Y + imgToDoc(posY)-D/2)+"' width='"+D+"' height='"+D+"'  style='fill:"+fillColor+";stroke-width:1;stroke:"+strokeColor+"' />";
 						
 				        break;
 
 				    default:
 				    	//draws circular perforation by default
 				    	ctx.beginPath();
-						ctx.arc(X + posX, Y + posY, D / 2, 0, 2 * 3.14159265359, false);
+						ctx.arc(X + imgToDoc(posX), Y + imgToDoc(posY), D / 2, 0, 2 * 3.14159265359, false);
 						ctx.fillStyle = fillColor;
 						ctx.fill();
 						ctx.lineWidth = 1;
 						ctx.strokeStyle = strokeColor;
-  						ctx.stroke();
+  						//ctx.stroke();
 						
 						//SVG
-						svgString += "<circle cx='"+(X + posX)+"' cy='"+(Y + posY)+"' r='"+(D/2)+"' stroke='"+strokeColor+"' stroke-width='1' fill='"+fillColor+"' />";
+						svgString += "<circle cx='"+(X + imgToDoc(posX))+"' cy='"+(Y + imgToDoc(posY))+"' r='"+(D/2)+"' stroke='"+strokeColor+"' stroke-width='1' fill='"+fillColor+"' />";
 
 				        break;
 				}
@@ -427,65 +434,6 @@ function draw(){
 /* ************************ *
  * FUNCTIONS 				*
  * ************************ */
-
-/**
- * Updates all parameter 
- */
-function updateParameters(){
-	
-	//document size
-	if(img!=null){
-		if(docH != parseInt($("#docH").val())){
-			//change size proportionally to uploaded image
-			var factor = parseInt($("#docH").val()) / img.height;
-			docW = Math.ceil(img.width*factor);
-			docH = parseInt($("#docH").val());
-		} else if(docW != parseInt($("#docW").val())){
-			//change size proportionally to uploaded image
-			var factor = parseInt($("#docW").val()) / img.width;
-			docH = Math.ceil(img.height*factor);
-			docW = parseInt($("#docW").val());
-		} else{
-			docW = parseInt($("#docW").val());
-			docH = parseInt($("#docH").val());
-		}
-	} else{
-		docW = parseInt($("#docW").val()) || "";
-		docH = parseInt($("#docH").val()) || "";
-	}
-	
-	$("#docW").val(docW);
-	$("#docW").attr( "value", docW);
-	
-	$("#docH").val(docH);
-	$("#docH").attr( "value", docH);
-	
-	//shape
-	perforations = $("#perforationtype").val();
-	ortho = ($("#gridstacking").val() == "ortho") ? true : false;
-	inverted = ($("#perforate").val() == "true") ? true : false;
-	
-	//size
-	minD = constrain(parseInt($("#minD").val()), 0, maxD);
-	$("#minD").val(minD);
-	$("#minD").attr( "value", minD);
-	
-	maxD = constrain(parseInt($("#maxD").val()), minD, capD);
-	$("#maxD").val(maxD);
-	$("#maxD").attr( "value", maxD);
-	
-	minMargin = constrain(parseInt($("#minMargin").val()), 0, capMargin);
-	$("#minMargin").val(minMargin);
-	$("#minMargin").attr( "value", minMargin);
-	
-	
-	//update all drawing parameters
-	stepX = maxD + minMargin;
-	//if triangular stacking recalc stepY
-	stepY = (ortho || perforations == "rectangles") ? maxD + minMargin : Math.round(stepX * 0.86602540378);
-	initialX = Math.round(stepX / 2);
-	initialY = Math.round(stepY / 2);
-}
 
 //activate fileselect
 function onFileSelected(event) {
@@ -543,7 +491,34 @@ function onFileSelected(event) {
 	reader.readAsDataURL(selectedFile);
 }
 
-/*FUNCTION TO MAP VALUE TO A RANGE by Gaby aka G. Petrioli*/
+/**
+ *Converts dimensions from document to image dimensions
+ * 
+ * @param float value The value to be converted
+ * @return float The value in image dimensions 
+ */
+function docToImg(value){
+	var docToImg = (img!=null) ? (img.width / docW) : 1;
+	return Math.round(value*docToImg);
+}
+
+/**
+ *Converts dimensions from image to document dimensions
+ * 
+ * @param float value The value to be converted
+ * @return float The value in document dimensions 
+ */
+function imgToDoc(value){
+	var imgToDoc = (img!=null) ? (docW / img.width) : 1;
+	return value*imgToDoc;
+}
+
+/**
+ * FUNCTION TO MAP VALUE TO A RANGE by Gaby aka G. Petrioli
+ * 
+ * @param
+ * @return
+ */
 function convertToRange(value, srcRange, dstRange) {
 	// value is outside source range return
 	if (value < srcRange[0] || value > srcRange[1]) {
@@ -593,6 +568,73 @@ function getAverage(posX, posY) {
 function constrain(value,min,max){
 	var returnValue = (value < min) ? min : (value > max) ? max : value;
 	return returnValue;
+}
+
+/**
+ * Updates all parameter 
+ * 
+ * @param
+ * @return
+ */
+function updateParameters(){
+	
+	//document size
+	if(img!=null){
+		if(docH != parseInt($("#docH").val())){
+			//change size proportionally to uploaded image
+			var factor = parseInt($("#docH").val()) / img.height;
+			docW = Math.ceil(img.width*factor);
+			docH = parseInt($("#docH").val());
+		} else if(docW != parseInt($("#docW").val())){
+			//change size proportionally to uploaded image
+			var factor = parseInt($("#docW").val()) / img.width;
+			docH = Math.ceil(img.height*factor);
+			docW = parseInt($("#docW").val());
+		} else{
+			docW = parseInt($("#docW").val());
+			docH = parseInt($("#docH").val());
+		}
+	} else{
+		docW = parseInt($("#docW").val()) || "";
+		docH = parseInt($("#docH").val()) || "";
+	}
+	
+	$("#docW").val(docW);
+	$("#docW").attr( "value", docW);
+	
+	$("#docH").val(docH);
+	$("#docH").attr( "value", docH);
+	
+	//shape
+	perforations = $("#perforationtype").val();
+	ortho = ($("#gridstacking").val() == "ortho") ? true : false;
+	inverted = ($("#perforate").val() == "true") ? true : false;
+	
+	//size
+	minD = constrain(parseInt($("#minD").val()), 0, maxD);
+	$("#minD").val(minD);
+	$("#minD").attr( "value", minD);
+	
+	maxD = constrain(parseInt($("#maxD").val()), minD, capD);
+	$("#maxD").val(maxD);
+	$("#maxD").attr( "value", maxD);
+	
+	minMargin = constrain(parseInt($("#minMargin").val()), 0, capMargin);
+	$("#minMargin").val(minMargin);
+	$("#minMargin").attr( "value", minMargin);
+	
+	
+	//update all drawing parameters
+	stepX = maxD + minMargin;
+	//if triangular stacking recalc stepY
+	stepY = (ortho || perforations == "rectangles") ? maxD + minMargin : Math.round(stepX * 0.86602540378);
+
+	initialX = docToImg(stepX / 2);
+	initialY = docToImg(stepY / 2);
+	
+	//conert to image diensions
+	stepX = docToImg(stepX);
+	stepY = docToImg(stepY);
 }
 
 
