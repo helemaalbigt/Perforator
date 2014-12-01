@@ -17,12 +17,31 @@ var stepX = 20; // center-to-center distance for perforation
 var stepY = 20;
 var initialX = 10; //initial perforation offset 
 var initialY = 10;
+
+//hole size
+var holesize = "range";
 var minD = 0; //min & max diameters D for perforations in perforation range
 var maxD = 8;
 var capD = 90; //max D on slider
+
+var numberOfSizes = 3;
+var sizes = new Array();
+var minS = 0;
+var maxS = 8;
+var s1 = 0;
+var s2 = 2;
+var s3 = 4;
+var s4 = 6;
+var s5 = 8;
+
 var minMargin = 3; // minimal margin between perforations
 var capMargin = 50; //max margin on slider
+
 var inverted = false; //whether bright areas are perforated (false) or dark areas (true)
+var drawLimit = false; //wheter or not certain diameters are ignored
+var minDdraw = 0;
+var maxDdraw = 90;
+
 var perforations = "circles";//rectangles or circles as perforations
 var ortho = true;//orthogonal grid or triangular grid
 var pixels = new Array();//pixel array
@@ -55,6 +74,13 @@ var varUpdated = false;//variables updated?
 $(document).ready(function() {
 	
 	/*
+	 * Indent all options in select inputs
+	 */
+	$( "option" ).each(function() {
+		$(this).append("&nbsp;&nbsp;");
+	});
+	
+	/*
 	 * Setup canvasses
 	 */
 	//get the main canvas
@@ -63,6 +89,13 @@ $(document).ready(function() {
 	//offscreen (OS) canvas to store the original image as a reference to the generated pattern
 	OSCanvas = $('<canvas/>')[0];
 	OSctx = OSCanvas.getContext("2d");
+	//makes canvas draggable
+	//$("#canvas").draggable();
+	
+	/*
+	 * Make menu draggable
+	 */
+	//$("#scrollable_menu").draggable({ axis: "y", cursor: "move"});
 	
 	/*
 	 * activate sliders
@@ -80,20 +113,18 @@ $(document).ready(function() {
 	      range: false,
 	      min: 0,
 	      max: capMargin,
-	      value: 3,
+	      value: 2,
 	      slide: function( event, ui ) {
 	      	//sliding the slider updates the values
-	        $( this ).next().next().val(ui.value);
-	       	$( this ).next().next().attr( "value", ui.value);
+	        $( this ).next().next().children().val(ui.value);
+	       	$( this ).next().next().children().attr( "value", ui.value);
 	        //update parameters
 	        updateParameters();
 	      }
 	    });
 	    //update values for first time
-	    $( this ).next().next().val($( this ).slider('values',0));
-	    $( this ).next().next().next().next().val($( this ).slider('values',1));
-       	$( this ).next().next().attr( "value", $( this ).slider('values',0));
-        $( this ).next().next().next().next().attr( "value", $( this ).slider('values',1) );
+	    $( this ).next().next().children().val($( this ).slider('value'));
+       	$( this ).next().next().children().attr( "value", $( this ).slider('value'));
  	});
 	
 	//range sliders
@@ -107,17 +138,17 @@ $(document).ready(function() {
 	      	//sliding the slider updates the values
 	        $( this ).next().next().val(ui.values[ 0 ]);
 	       	$( this ).next().next().attr( "value", ui.values[ 0 ] );
-	        $( this ).next().next().next().next().val(ui.values[ 1 ]);
-	        $( this ).next().next().next().next().attr( "value", ui.values[ 1 ] );
+	        $( this ).next().next().next().children().val(ui.values[ 1 ]);
+	        $( this ).next().next().next().children().attr( "value", ui.values[ 1 ] );
 	        //update parameters
 	        updateParameters();
 	      }
 	    });
 	    //update values for first time
 	    $( this ).next().next().val($( this ).slider('values',0));
-	    $( this ).next().next().next().next().val($( this ).slider('values',1));
+	    $( this ).next().next().next().children().val($( this ).slider('values',1));
        	$( this ).next().next().attr( "value", $( this ).slider('values',0));
-        $( this ).next().next().next().next().attr( "value", $( this ).slider('values',1) );
+        $( this ).next().next().next().children().attr( "value", $( this ).slider('values',1) );
  	});
  	
  	
@@ -129,7 +160,7 @@ $(document).ready(function() {
 		$(this).change(function(){
 			//apply value to slider
 			updateParameters();
-			$(this).prev().prev().slider('value',$(this).val());
+			$(this).parent().prev().prev().slider('value',$(this).val());
 		});
 	});
  	//range sliders
@@ -144,7 +175,7 @@ $(document).ready(function() {
 		$(this).change(function(){
 			//apply value to slider
 			updateParameters();
-			$(this).prev().prev().prev().prev().slider('values',1,$(this).val());
+			$(this).parent().prev().prev().prev().slider('values',1,$(this).val());
 		});
 	});
 	
@@ -355,46 +386,15 @@ function draw(){
 				posX += Math.round(stepX / 2);
 			}
 			if(posX >= img.width) break;
-			//check if value exists
-			var pixelIndex = Math.round(img.width*(posY-1)+posX);
-			if (pixels[pixelIndex]) {
-				var red = pixels[pixelIndex][0];
-				var green = pixels[pixelIndex][1];
-				var blue = pixels[pixelIndex][2];
+			
+			var D = calcD(posX,posY);
+				
+			//determine perforation colors
+			var fillColor = (!inverted) ? "white" : "black";
+			var strokeColor = (!inverted) ? "black" : "white";
 
-				//calculate average
-				var R = 0;
-				var G = 0;
-				var B = 0;
-				var a = 0;
-				var count = 0;
-				for ( k = Math.round(-stepX / 2); k < (stepX / 2); k++) {
-					for ( l = Math.round(-stepY / 2); l < (stepY / 2); l++) {
-						if (pixels[img.width * (posY - 1 + l) + posX + k]) {
-							R += pixels[img.width * (posY - 1 + l) + posX + k][0];
-							G += pixels[img.width * (posY - 1 + l) + posX + k][1];
-							B += pixels[img.width * (posY - 1 + l) + posX + k][2];
-							a += pixels[img.width * (posY - 1 + l) + posX + k][3];
-							count++;
-						}
-					}
-				}
-				if (parseInt(count) > 0) {
-					red = R / count;
-					green = G / count;
-					blue = B / count;
-					a = a / count;
-				}
-
-				//convert RGB into brightness
-				var brightness = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
-				//map brightness to diameter
-				var D = (!inverted) ? convertToRange(brightness, [0, 255], [minD, maxD]) : convertToRange(brightness, [0, 255], [maxD, minD]);
-				//determine perforation colors
-				var fillColor = (!inverted) ? "white" : "black";
-				var strokeColor = (!inverted) ? "black" : "white";
-
-				//draw perforation
+			//draw perforation (dont draw if limiting drawn perforations)
+			if(!drawLimit || (D>=minDdraw && D<=maxDdraw)){
 				switch(perforations) {
 				    case "rectangles":
 				    //draws rectangular perforation
@@ -424,11 +424,84 @@ function draw(){
 
 				        break;
 				}
+				
 			}
 		}
 	}
 	/*CLOSE SVG STRING*/
 	svgString += "</svg>";
+}
+
+/**
+ *Calc Diameter
+ * 
+ * Calculates and returns a diameter
+ * 
+ * @param float posX
+ * @param float posY
+ * @return float  
+ */
+function calcD(posX,posY){
+	//the variable we'll return
+	var D = 0;
+	//mean brightness of point
+	var brightness = 0;
+	
+	//calculate the mean brightness in this area of the image
+    //check if value exists
+	var pixelIndex = Math.round(img.width*(posY-1)+posX);
+	if (pixels[pixelIndex]) {
+		var red = pixels[pixelIndex][0];
+		var green = pixels[pixelIndex][1];
+		var blue = pixels[pixelIndex][2];
+
+		//calculate average
+		var R = 0;
+		var G = 0;
+		var B = 0;
+		var a = 0;
+		var count = 0;
+		for ( k = Math.round(-stepX / 2); k < (stepX / 2); k++) {
+			for ( l = Math.round(-stepY / 2); l < (stepY / 2); l++) {
+				if (pixels[img.width * (posY - 1 + l) + posX + k]) {
+					R += pixels[img.width * (posY - 1 + l) + posX + k][0];
+					G += pixels[img.width * (posY - 1 + l) + posX + k][1];
+					B += pixels[img.width * (posY - 1 + l) + posX + k][2];
+					a += pixels[img.width * (posY - 1 + l) + posX + k][3];
+					count++;
+				}
+			}
+		}
+		if (parseInt(count) > 0) {
+			red = R / count;
+			green = G / count;
+			blue = B / count;
+			a = a / count;
+		}
+
+		//convert RGB into brightness
+		brightness = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
+	}
+	
+	switch (holesize) { 
+		case 'fixed':
+			//calculate mapped value of diameter
+			var realD = (!inverted) ? convertToRange(brightness, [0, 255], [minS, maxS]) : convertToRange(brightness, [0, 255], [maxS, minS]);
+			var approxD = 9999999999;
+			//search for the closest size in our array
+			for(var m=0; m<numberOfSizes; m++){
+				approxD = (Math.abs(realD - sizes[m]) < Math.abs(realD - approxD))? sizes[m] : approxD;
+			}
+			D = approxD;
+			break;
+		
+	    default: 
+	    	//default is "range"
+			//map brightness to diameter
+			D = (!inverted) ? convertToRange(brightness, [0, 255], [minD, maxD]) : convertToRange(brightness, [0, 255], [maxD, minD]);    	
+	    	break;
+	}
+	return D;
 }
 
 /* ************************ *
@@ -486,6 +559,10 @@ function onFileSelected(event) {
 			updateParameters()
 			refresh();
 			updateSeekerWindowVariables();
+			
+			//resize the scollable part of the menu
+			var previewImg = $("#input_img");
+			$("#scrollable_menu_wrapper").css("height",$( window ).height() - (46+previewImg.height()) );
 		}
 	};
 	reader.readAsDataURL(selectedFile);
@@ -577,6 +654,7 @@ function constrain(value,min,max){
  * @return
  */
 function updateParameters(){
+	//UPDATE INPUT PARAMETERS
 	
 	//document size
 	if(img!=null){
@@ -608,9 +686,20 @@ function updateParameters(){
 	//shape
 	perforations = $("#perforationtype").val();
 	ortho = ($("#gridstacking").val() == "ortho") ? true : false;
-	inverted = ($("#perforate").val() == "true") ? true : false;
 	
 	//size
+	holesize = $("#holesize").val();
+	numberOfSizes = parseInt($("#numberOfSizes").val());
+	
+	sizes[0] = parseInt($("#s1").val());
+	sizes[1] = parseInt($("#s2").val());
+	sizes[2] = parseInt($("#s3").val());
+	sizes[3] = parseInt($("#s4").val());
+	sizes[4] = parseInt($("#s5").val());
+	
+	minS = Math.min.apply(null, sizes);
+	maxS = Math.max.apply(null, sizes);
+	
 	minD = constrain(parseInt($("#minD").val()), 0, maxD);
 	$("#minD").val(minD);
 	$("#minD").attr( "value", minD);
@@ -623,11 +712,53 @@ function updateParameters(){
 	$("#minMargin").val(minMargin);
 	$("#minMargin").attr( "value", minMargin);
 	
+	//draw options
+	inverted = ($("#perforate").val() == "true") ? true : false;
+	drawLimit = ($("#drawLimit").val() == "true") ? true : false;
 	
-	//update all drawing parameters
-	stepX = maxD + minMargin;
+	minDdraw = constrain(parseInt($("#minDdraw").val()), 0, maxDdraw);
+	$("#minDdraw").val(minDdraw);
+	$("#minDdraw").attr( "value", minDdraw);
+	
+	maxDdraw = constrain(parseInt($("#maxDdraw").val()), minDdraw, capD);
+	$("#maxDdraw").val(maxDdraw);
+	$("#maxDdraw").attr( "value", maxDdraw);
+	
+	
+	//TOGGLE VISIBILITIES
+	//handle visibility for holesize options
+	$('.holesize_param').each(function() {
+		$(this).hide();
+	});
+	switch (holesize) { 
+		case 'fixed':
+			$("#fixed_param").show();
+			break;
+		
+	    default: 
+	    	//default is "range"
+	    	$("#range_param").show();
+	    	break;
+	    	
+	}
+	
+	//handle visibility for n°holesizes
+	var c = 0;
+	$('.holesize_value').each(function() {
+		var display = (c<numberOfSizes) ? "block" : "none";
+		$(this).css("display", display);
+		c++;	
+	});
+	
+	//handle visibility for drawLimit
+	var drawLimitDisplay = (drawLimit) ? "block" : "none";
+	$("#display_range").css("display", drawLimitDisplay);
+	
+	
+	//UPDATE DRAWING PARAMETERS
+	stepX = (holesize=="range") ? (maxD + minMargin) : (maxS + minMargin);
 	//if triangular stacking recalc stepY
-	stepY = (ortho || perforations == "rectangles") ? maxD + minMargin : Math.round(stepX * 0.86602540378);
+	stepY = (ortho || perforations == "rectangles") ? stepX : Math.round(stepX * 0.86602540378);
 
 	initialX = docToImg(stepX / 2);
 	initialY = docToImg(stepY / 2);
@@ -637,14 +768,3 @@ function updateParameters(){
 	stepY = docToImg(stepY);
 }
 
-
-
-
-/* ***************************** *
- * download image manager         *
- * ****************************** */
-
-window.onload = function() {
-	
-	
-};

@@ -49,7 +49,7 @@
 					</div>
 				</div>
 				<!--start sidebar-->
-				<div class="sidebar_menu">
+				<div class="sidebar_menu" id="sidebar_menu">
 					<div class="menu_group thick_underline">
 						<div class="app_title">
 							<h4><span>Perforations</span></h4>
@@ -62,7 +62,7 @@
 							<div class="input_img_wrapper">
 								<img id="input_img">
 								<div id="input_img_helptext">
-									<span>select an image to process</span>
+									<span>no image selected</span>
 								</div>
 							</div>
 							<div id="seekerwindow">
@@ -71,135 +71,238 @@
 						</div>
 					</div>
 
-					<div class="menu_group">
-						<div class="menu_group_title">
-							document
-						</div>
-						<!--upload image-->
-						<div class="menu_subgroup border_top">
-							<div class="clickable_area_fullwidth">
-								<input id="img_input" type="file" name="img" onchange="onFileSelected(event)">
-								<div id="img_input_backbutton">
-									<span>upload image<img src="files/upload.png"/></span>
+					<!--scrollable area-->
+					<div id="scrollable_menu_wrapper">
+						<div id="scrollable_menu">
+
+							<div class="menu_group">
+								<div class="menu_group_title">
+									<span>document</span>
 								</div>
-							</div>
-						</div>
-						<!--dimensions-->
-						<div class="menu_subgroup inputline">
-							<span>
-								<label for="docW" class="inputlabel inline">dimensions</label>
-								<input type="text" id="docW" class="XS inline input"><span class="additional_text">x</span><input type="text" id="docH" class="XS inline input"><span class="additional_text">mm</span>
-							</span>
-						</div>
-						<!--refresh button-->
-						<div class="menu_subgroup">
-							<div class="clickable_area_fullwidth refresh_image">
-								<!--<input id="refresh" type="button" name="refresh" value="refresh" onmousedown="refreshPressed()">-->
-								<a href='javascript:refresh()'><span>redraw<img src="files/refresh.png"/></span></a>
-							</div>
-						</div>
-					</div>
-					
-					<div class="menu_group">
-						<div class="menu_group_title">
-							hole shape
-						</div>
-						<!--selection list - perforation type-->
-						<div class="menu_subgroup border_top">
-							<div class="selection_list">
-								<div class="title">
-									perforation :
-								</div>
-								<select id="perforationtype" class="list input">
-									<option value="circles"><span>circles</span></option>
-									<option value="rectangles"><span>rectangles</span></option>
-								</select>
-							</div>
-						</div>
-						<!--selection list - gridlayout-->
-						<div class="menu_subgroup">
-							<div class="selection_list">
-								<div class="title">
-									grid :
-								</div>
-								<select id="gridstacking" class="list input">
-									<option value="ortho" selected="selected"><span>orthogonal</span></option>
-									<option value="tri"><span>triangular</span></option>
-								</select>
-							</div>
-						</div>
-						<!--selection list - perforate-->
-						<div class="menu_subgroup">
-							<div class="selection_list">
-								<div class="title">
-									perforate :
-								</div>
-								<select id="perforate" class="list input">
-									<option value="false" selected="selected"><span>bright areas</span></option>
-									<option value="true"><span>dark areas</span></option>
-								</select>
-							</div>
-						</div>
-					</div>
-					
-					<div class="menu_group">
-						<div class="menu_group_title">
-							hole size
-						</div>
-						<!--selection list - hole sizes-->
-						<div class="menu_subgroup border_top">
-							<div class="selection_list">
-								<div class="title">
-									hole sizes :
-								</div>
-								<select id="holesize" class="list input">
-									<option value="true" selected="selected"><span>range</span></option>
-									<option value="false"><span>fixed</span></option>
-								</select>
-							</div>
-						</div>
-						<!--sliders - perforation size-->
-						<div class="menu_subgroup">
-							<div class="sliders">
-								<div class="slider_wrapper">								
-									<!--perf size-->									 
-									<div class="slider_input">
-										<div class="slider slider_range"></div>
-										<label for="minD" class="inputlabel inline">D min:</label>
-										<input type="text" id="minD" class="XS inline input slider_input_range_min">
-										<label for="maxD" class="inputlabel inline">&nbsp; max:</label>
-										<input type="text" id="maxD" class="XS inline input slider_input_range_max"><span class="additional_text">mm</span>
+								<!--upload image-->
+								<div class="menu_subgroup border_top">
+									<div class="clickable_area_fullwidth">
+										<input id="img_input" type="file" name="img" onchange="onFileSelected(event)">
+										<div id="img_input_backbutton">
+											<span>upload image<img class="input_float" src="files/upload.png"/></span>
+										</div>
 									</div>
-									<!--min margin-->
-									<div class="slider_input">
-										<div class="slider slider_simple"></div>
-										<label for="minMargin" class="inputlabel inline">min. margin:</label>
-										<input type="text" id="minMargin" class="XS inline input slider_input_simple"><span class="additional_text">mm</span>
-									</div>		
-								</div>							
+								</div>
+								<!--dimensions-->
+								<div class="menu_subgroup inputline">
+									<span> <label for="docW" class="inputlabel inline">dimensions</label> <span class="input_float">
+											<input type="text" id="docW" class="XS inline input">
+											<span class="additional_text">x</span>
+											<input type="text" id="docH" class="XS inline input">
+											<span class="additional_text">mm</span> </span> </span>
+								</div>
+								<!--refresh button-->
+								<div class="menu_subgroup">
+									<div class="clickable_area_fullwidth refresh_image">
+										<!--<input id="refresh" type="button" name="refresh" value="refresh" onmousedown="refreshPressed()">-->
+										<a href='javascript:refresh()'><span>redraw<img class="input_float" src="files/refresh.png"/></span></a>
+									</div>
+								</div>
 							</div>
+
+							<div class="menu_group">
+								<div class="menu_group_title">
+									<span>hole geometry</span>
+								</div>
+								<!--selection list - perforation type-->
+								<div class="menu_subgroup border_top">
+									<div class="selection_list">
+										<div class="title">
+											perforation :
+										</div>
+										<select id="perforationtype" class="list input">
+											<option value="circles"><span>circles</span></option>
+											<option value="rectangles"><span>rectangles</span></option>
+										</select>
+									</div>
+								</div>
+								<!--selection list - gridlayout-->
+								<div class="menu_subgroup">
+									<div class="selection_list">
+										<div class="title">
+											grid :
+										</div>
+										<select id="gridstacking" class="list input">
+											<option value="ortho" selected="selected"><span>orthogonal</span></option>
+											<option value="tri"><span>triangular</span></option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="menu_group">
+								<div class="menu_group_title">
+									<span>hole size</span>
+								</div>
+								<!--selection list - hole sizes-->
+								<div class="menu_subgroup border_top">
+									<div class="selection_list">
+										<div class="title">
+											hole sizes :
+										</div>
+										<select id="holesize" class="list input">
+											<option value="range" selected="selected"><span>range</span></option>
+											<option value="fixed"><span>fixed</span></option>
+										</select>
+									</div>
+								</div>
+								<!--sliders - perforation size range-->
+								<div class="menu_subgroup holesize_param" id="range_param">
+									<div class="sliders">
+										<div class="slider_wrapper">
+											<!--perf size-->
+											<div class="slider_input">
+												<div class="slider slider_range"></div>
+												<label for="minD" class="inputlabel inline">D min:</label>
+												<input type="text" id="minD" class="XS inline input slider_input_range_min">
+												<span class="input_float nomargin"> <label for="maxD" class="inputlabel inline">&nbsp; max:</label>
+													<input type="text" id="maxD" class="XS inline input slider_input_range_max">
+													<span class="additional_text">mm</span> </span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!--sliders - perforation size fixed-->
+								<div class="menu_subgroup holesize_param" id="fixed_param">
+									<div class="selection_list">
+										<div class="title">
+											n° sizes :
+										</div>
+										<select id="numberOfSizes" class="list input">
+											<option value="1"><span>1</span></option>
+											<option value="2"><span>2</span></option>
+											<option value="3" selected="selected"><span>3</span></option>
+											<option value="4"><span>4</span></option>
+											<option value="5"><span>5</span></option>
+										</select>
+									</div>
+									<!--sizes sliders-->
+									<div class="slider_wrapper">
+										<div class="slider_input holesize_value">
+											<div class="slider slider_simple"></div>
+											<label for="s1" class="inputlabel inline">size 1:</label>
+											<span class="input_float nomargin">
+												<input type="text" id="s1" class="XS inline input slider_input_simple">
+												<span class="additional_text">mm</span> </span>
+										</div>
+										<div class="slider_input holesize_value">
+											<div class="slider slider_simple"></div>
+											<label for="s2" class="inputlabel inline">size 2:</label>
+											<span class="input_float nomargin">
+												<input type="text" id="s2" class="XS inline input slider_input_simple">
+												<span class="additional_text">mm</span> </span>
+										</div>
+										<div class="slider_input holesize_value">
+											<div class="slider slider_simple"></div>
+											<label for="s3" class="inputlabel inline">size 3:</label>
+											<span class="input_float nomargin">
+												<input type="text" id="s3" class="XS inline input slider_input_simple">
+												<span class="additional_text">mm</span> </span>
+										</div>
+										<div class="slider_input holesize_value">
+											<div class="slider slider_simple"></div>
+											<label for="s4" class="inputlabel inline">size 4:</label>
+											<span class="input_float nomargin">
+												<input type="text" id="s4" class="XS inline input slider_input_simple">
+												<span class="additional_text">mm</span> </span>
+										</div>
+										<div class="slider_input holesize_value">
+											<div class="slider slider_simple"></div>
+											<label for="s5" class="inputlabel inline">size 5:</label>
+											<span class="input_float nomargin">
+												<input type="text" id="s5" class="XS inline input slider_input_simple">
+												<span class="additional_text">mm</span> </span>
+										</div>
+									</div>
+								</div>
+
+								<!--min margin-->
+								<div class="menu_subgroup">
+									<div class="sliders">
+										<div class="slider_wrapper">
+											<div class="slider_input">
+												<div class="slider slider_simple"></div>
+												<label for="minMargin" class="inputlabel inline">min. margin:</label>
+												<span class="input_float nomargin">
+													<input type="text" id="minMargin" class="XS inline input slider_input_simple">
+													<span class="additional_text">mm</span> </span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="menu_group">
+								<div class="menu_group_title">
+									<span>draw options</span>
+								</div>
+								<!--selection list - perforate-->
+								<div class="menu_subgroup top">
+									<div class="selection_list">
+										<div class="title">
+											perforate :
+										</div>
+										<select id="perforate" class="list input">
+											<option value="false" selected="selected"><span>bright areas</span></option>
+											<option value="true"><span>dark areas</span></option>
+										</select>
+									</div>
+								</div>
+								<!--selection list - draw-->
+								<div class="menu_subgroup">
+									<div class="selection_list">
+										<div title="Controls whether or not all perforations are drawn. selecting a range will allow you to export only part of the perforations. Example usage: when using a CNC mill to make your image, you can use this option to devide the CNC milling process into sections based on mill diameter" class="title">
+											draw :
+										</div>
+										<select id="drawLimit" class="list input">
+											<option value="false" selected="selected"><span>all perforations</span></option>
+											<option value="true"><span>perforations in range</span></option>
+										</select>
+									</div>
+
+									<!--displayrange-->
+									<div class="sliders" id="display_range">
+										<div class="slider_wrapper">
+											<div class="slider_input">
+												<div class="slider slider_range"></div>
+												<label for="minDdraw" class="inputlabel inline">D min:</label>
+												<input type="text" id="minDdraw" class="XS inline input slider_input_range_min">
+												<span class="input_float nomargin"> <label for="maxDdraw" class="inputlabel inline">&nbsp; max:</label>
+													<input type="text" id="maxDdraw" class="XS inline input slider_input_range_max">
+													<span class="additional_text">mm</span> </span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="menu_group">
+								<div class="menu_group_title">
+									<span>download</span>
+								</div>
+								<!--download png-->
+								<div class="menu_subgroup border_top">
+									<div class="clickable_area_fullwidth download_image download_jpeg">
+										<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
+										<a id="downloadlnk" download="perforations.png"><span>download PNG<img class="input_float" src="files/download.png"/></span></a>
+									</div>
+								</div>
+								<!--download png-->
+								<div class="menu_subgroup">
+									<div class="clickable_area_fullwidth download_image download_jpeg">
+										<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
+										<a id="downloadsvg" download="perforations.svg"><span>download SVG<img class="input_float" src="files/download.png"/></span></a>
+									</div>
+								</div>
+							</div>
+
 						</div>
 					</div>
-					
-					<div class="menu_group">
-						<div class="menu_group_title">
-							download
-						</div>
-						<!--download png-->
-						<div class="menu_subgroup border_top">
-							<div class="clickable_area_fullwidth download_image download_jpeg">
-								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
-								<a id="downloadlnk" download="perforations.png"><span>download PNG<img src="files/download.png"/></span></a>
-							</div>
-						</div>
-						<!--download png-->
-						<div class="menu_subgroup">
-							<div class="clickable_area_fullwidth download_image download_jpeg">
-								<!--<input id="refresh" type="button" name="refresh" value="refresh"onmousedown="refreshPressed()">-->
-								<a id="downloadsvg" download="perforations.svg"><span>download SVG<img src="files/download.png"/></span></a>
-							</div>
-						</div>
-					</div>	
 
 				</div>
 				<!--end sidebar-->
@@ -207,14 +310,14 @@
 				<div id="render_window" onscroll="updateSeekerWindow()">
 					<canvas id="canvas" width="1" height="1"></canvas>
 				</div>
-				<!--end canvas-->				
+				<!--end canvas-->
 			</div>
 		</div>
 		<script>
-		/*	if (!Modernizr.touch)// if not a smartphone
-				debiki.Utterscroll.enable({
-					scrollstoppers : '.CodeMirror, .ui-resizable-handle'
-				});*/
+			/*	if (!Modernizr.touch)// if not a smartphone
+			 debiki.Utterscroll.enable({
+			 scrollstoppers : '.CodeMirror, .ui-resizable-handle'
+			 });*/
 		</script>
 	</body>
 </html>

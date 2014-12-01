@@ -1,0 +1,489 @@
+/**
+ * SASS Variables
+ */
+//colors
+$color_background: rgb(240,60,60);
+$color_title: white;
+$color_subtitle: black;
+$color_text: black;
+$color_info: rgba(255,255,255,0.6);
+$color_input: white;
+$color_hover: rgb(255,104,104);
+$color_line: rgba(0,0,0,0.3);
+//dimensions
+$menu_padding_left:10px;
+$menu_padding_right:10px;
+$menu_width:260px;
+$button_padding_top:5.5px;
+$button_height:30px;
+
+/*
+ * General
+ */
+.body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.PA_wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  display: table;
+  overflow: hidden;
+  font-size: 90%;
+  
+  
+   /**
+   * browser alert
+   */
+  .uncompatible_browser {
+      display:none;
+      z-index:1000;
+      
+        /*target IE10*/
+      html[data-useragent*='MSIE 10.0']{
+        display:block;
+      }
+      
+      /*target rest of IE*/
+      @media \0screen\, screen\9, screen\0, \0screen{
+        display:block;
+      }
+      
+        /*target safari*/
+      @media screen and (-webkit-min-device-pixel-ratio:0) { 
+          /* Safari only override */
+          ::i-block-chrome{
+            .uncompatible_browser {
+              display:block;
+            }
+          }
+      }
+      
+        /*target safari ipad*/
+      @media only screen 
+      and (min-device-width : 768px) 
+      and (max-device-width : 1024px) {
+          display:none;
+      }
+      
+        /*target safari iphone*/
+      @media only screen 
+      and (min-device-width : 320px) 
+      and (max-device-width : 480px){
+          display:none;
+      }
+      
+      .black{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        background-color:black;
+        background-color:rgba(0,0,0,0.90);
+        z-index:1000;
+      }
+      
+      .message{
+          position:absolute;
+          font-style:Arial;
+          left:50%;
+          top:50%;
+          margin:-75px 0 0 -150px;
+          background-color: $color_background;
+          text-align:center;
+          width:300px;
+          height:150px;
+          z-index:2000;
+      }
+        
+      .message span{
+          position:relative;
+          top:47px;
+          font-style:Arial;
+          color:white;
+          width:270px;
+          //text-transform: uppercase;
+      }
+  }
+  
+          /*target safari*/
+      @media screen and (-webkit-min-device-pixel-ratio:0) { 
+          /* Safari only override */
+          ::i-block-chrome{
+            .uncompatible_browser {
+              display:block;
+            }
+          }
+      }
+  
+  /**
+   * window
+   */
+  #render_window {
+      display: block;
+      height: 100vh;
+      background-image: url(../files/empty_background.gif);
+      position:relative;
+      overflow:auto;
+      
+      #canvas {
+        position:absolute;
+        top:0;
+        left:0;
+      }
+  }
+  
+   /**
+   * sidebar
+   */
+  .sidebar_menu {
+    display: block;
+    width: $menu_width;
+    float: left;
+    height: 100vh;
+    color: $color_text;
+    font-family: arial;
+    background-color: $color_background;
+    
+    /*general*/
+    .thick_underline{
+      border-bottom: 1px solid $color_line;
+    }
+    
+    .menu_subgroup{
+      border-bottom: 1px solid $color_line;
+      
+      .input_float{
+        float:right;
+        margin-right:$menu_padding_right;
+        position:relative;
+      }
+      
+      .input_float.nomargin{
+        margin-right:0;
+      }
+    }
+    
+    .menu_subgroup.top{
+      border-top: 1px solid $color_line;
+    }
+    
+    .menu_subgroup.final{
+      border-bottom: none;
+    }
+    
+    .input{
+      position:relative;
+      color:$color_input;
+    }
+    
+    #scrollable_menu_wrapper{
+      height:calc(100% - 196px);
+      overflow-x:hidden;
+      overflow-y:auto;
+      //direction:rtl;
+    }
+    
+    #scrollable_menu{
+      height:100%;
+      //direction:ltr;
+    }
+      
+      /*title*/
+     .app_title h4 {
+        color: $color_title;
+        font-size: 110%;
+        height: 45px;
+        margin: 0 0 0 $menu_padding_left;
+        text-align: left;
+        text-transform: uppercase;
+        position: relative;
+        
+        span {
+          position: relative;
+          top: 13px;
+        }
+      }
+      
+      /*sub-title*/
+      .menu_group_title span{
+        margin: 0 0 0 $menu_padding_left;
+      }
+      
+     /*image*/
+     .input_img_wrapper{
+        img#input_img {
+          max-width: 100%;
+          display: block;
+          margin: auto;
+        }
+        
+        #input_img_helptext {
+          display: block;
+          width: 100%;
+          height: 150px;
+          background-color: rgb(10,10,10);
+          color: $color_info;
+          text-align: center;
+          
+          span {
+            position: relative;
+            top: 65px;
+          }
+        }
+      }
+      
+     /*seeker window*/
+     #seekerwindow{
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:1000000;
+    }
+  }
+  
+}
+
+
+/*
+ * corrections
+ */
+.PA #canvas_seeker {
+  z-index:1000000;
+  top:0;
+  left:0;
+}
+
+@-moz-document url-prefix() { 
+  .input_float{
+    top:$button_padding_top;
+  }
+  
+  .slider_input .input_float{
+    position:relative;
+    top:-1px;
+  }
+}
+
+
+/*
+ * Sidebar menu
+ */
+
+/*clickable areas general*/
+.PA .clickable_area_fullwidth, .PA .inputline{
+  
+  position: relative;
+  height: $button_height;
+}
+
+.PA .clickable_area_fullwidth a, .PA .clickable_area_fullwidth input{
+  color: $color_text;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  
+}
+
+.PA .inputline{
+    color: $color_text;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+.PA .inputline span:first-child{
+    margin-left: $menu_padding_left;
+    position: relative;
+    top: $button_padding_top;
+}
+
+.PA .clickable_area_fullwidth a:hover, .PA .clickable_area_fullwidth input:hover {
+  background-color: $color_hover;
+  cursor: pointer;
+  cursor: hand;
+}
+
+.PA .clickable_area_fullwidth a span {
+  position: relative;
+  top: $button_padding_top;
+  margin-left: $menu_padding_left;
+}
+
+/*file upload*/
+.PA #img_input {
+  position: relative;
+  width: 100%;
+  display: block;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  z-index: 20;
+}
+
+.PA #img_input:hover {
+  cursor: pointer;
+  cursor: hand;
+}
+
+.PA #img_input:hover + #img_input_backbutton {
+  background-color: $color_hover;
+}
+
+.PA #img_input_backbutton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: $color_text;
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+}
+
+.PA #img_input_backbutton span {
+  position: relative;
+  top: 5px;
+  margin-left: $menu_padding_left;
+}
+
+.PA #img_input_backbutton span img {
+  position: relative;
+  margin-top: -12.5px;
+  top: 50%;
+}
+
+@-moz-document url-prefix() {
+.PA #img_input_backbutton span img {
+  position: relative;
+  top:18px;
+}
+}
+
+/*refresh button*/
+
+/*grid selection menu*/
+.PA .selection_list{
+  
+  height:$button_height;
+  width:100%;
+  position:relative;
+}
+
+.PA .selection_list .list{
+  height: $button_height;
+  background-color: $color_background;
+  border: none;
+  color: $color_input;
+  float:right;
+  position:absolute;
+  text-align:right;
+  right:0;
+  top:0px;
+}
+
+.PA .selection_list .list option{
+  height:$button_height;
+  background-color: $color_background;
+  text-align:right;
+}
+
+.PA .selection_list .list option innerHTML{
+    position:relative;
+  top:5px;
+}
+
+.PA .selection_list .title{
+  height:$button_height;
+  color:$color_text;
+  padding: 4.5px 0 0 $menu_padding_left;
+}
+
+/*slidermenu*/
+.PA .slider_input {
+  text-align: left;
+  color: $color_text;
+}
+
+.PA .slider_wrapper {
+  margin: 0 $menu_padding_right 0 10px;
+}
+
+.sliders .output, .sliders .title {
+  margin-top: 1px;
+}
+
+.sliders{
+  .slider {
+    margin-top: 8px;
+    width: $menu_width - 34px;
+  }
+} 
+
+  .slider_simple{
+    width: $menu_width - 34px;
+  }
+
+/*NEW*/
+
+.menu_group_title{
+   background-color: $color_hover;
+    color: $color_text;
+    font-weight: bold;
+    height: 25px;
+    padding: 5px 0 0 0px;
+   //margin-left:10px;
+    //text-decoration: underline;
+    text-transform: uppercase;
+}
+
+.inline{
+  display:inline;
+}
+
+.S{
+  width:40px;
+}
+
+.XS{
+  width:32px;
+}
+
+.additional_text{
+  color:$color_info;;  
+}
+
+input{
+  border:none;
+  border-bottom: solid 1px $color_line;
+  color:$color_text;
+  background-color: $color_background;
+  text-align:center;
+}
+
+.slider_input{
+  margin: 20px 0 ;
+}
+
+.slider{
+  margin: 25px 0px 5px 10px;
+}
+
+.border_top{
+    border-top: solid 1px $color_line;
+}
+
+#scrollable_menu{
+  position:relative;
+}
