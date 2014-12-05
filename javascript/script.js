@@ -13,6 +13,7 @@ var Y = 0;
 var img = null;//main image
 var docW = 0; //document width & height
 var docH = 0; 
+var borderMargin = 10;//margin around the document
 var stepX = 20; // center-to-center distance for perforation
 var stepY = 20;
 var initialX = 10; //initial perforation offset 
@@ -376,8 +377,8 @@ function draw(){
 	//SVG
 	svgString += "<rect width='"+docW+"' height='"+docH+"' style='fill:"+backgroundFillColor+";' />";
 	
-	for (var i = 0; initialX + i * stepX < img.width; i += 1) {
-		for (var j = 0; initialY + j * stepY < img.height; j += 1) {
+	for (var i = 0; initialX + i * stepX + maxD/2 < (img.width-docToImg(borderMargin)); i += 1) {
+		for (var j = 0; initialY + j * stepY + maxD/2 < (img.height-docToImg(borderMargin)); j += 1) {
 			
 			//X and Y position on the image
 			var posX = initialX + i * stepX;
@@ -385,7 +386,7 @@ function draw(){
 			if ((j % 2 === 0) && !ortho) {
 				posX += Math.round(stepX / 2);
 			}
-			if(posX >= img.width) break;
+			if(posX >= img.width-docToImg(borderMargin)) break;
 			
 			var D = calcD(posX,posY);
 				
@@ -683,6 +684,9 @@ function updateParameters(){
 	$("#docH").val(docH);
 	$("#docH").attr( "value", docH);
 	
+	//document borderMargin
+	borderMargin = $("#borderMargin").val();
+	
 	//shape
 	perforations = $("#perforationtype").val();
 	ortho = ($("#gridstacking").val() == "ortho") ? true : false;
@@ -760,8 +764,8 @@ function updateParameters(){
 	//if triangular stacking recalc stepY
 	stepY = (ortho || perforations == "rectangles") ? stepX : Math.round(stepX * 0.86602540378);
 
-	initialX = docToImg(stepX / 2);
-	initialY = docToImg(stepY / 2);
+	initialX = docToImg(stepX / 2) + docToImg(borderMargin);
+	initialY = docToImg(stepY / 2) + docToImg(borderMargin);
 	
 	//conert to image diensions
 	stepX = docToImg(stepX);
