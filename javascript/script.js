@@ -386,7 +386,7 @@ function draw(){
 			if ((j % 2 === 0) && !ortho) {
 				posX += Math.round(stepX / 2);
 			}
-			if(posX >= img.width-docToImg(borderMargin)) break;
+			if(posX+maxD/2 >= img.width-docToImg(borderMargin)) break;
 			
 			var D = calcD(posX,posY);
 				
